@@ -1,0 +1,17 @@
+PowerStateIntent turn {PowerState} the lights
+PowerStateIntent turn {PowerState} my painting
+BrightnessIntent set the lights to {Brightness}
+BrightnessIntent set my painting to {Brightness}
+BrightnessIntent set the lights to {Brightness} percent
+BrightnessIntent set my painting to {Brightness} percent
+ModeIntent set the lights to {Mode}
+ModeIntent set my painting to {Mode}
+
+-----LIST_OF_POWER_STATES-----
+On
+Off
+
+-----LIST_OF_MODES-----
+Static
+Still
+Wave

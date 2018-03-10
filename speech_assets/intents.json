@@ -1,0 +1,40 @@
+{
+  "intents": [
+    {
+      "intent":"PowerStateIntent",
+      "slots":[
+          {
+            "name": "PowerState",
+            "type": "LIST_OF_POWER_STATES"
+          }
+      ]
+    },
+    {
+      "intent":"BrightnessIntent",
+      "slots":[
+          {
+            "name": "Brightness",
+            "type": "AMAZON.NUMBERS"
+          }
+      ]
+    },
+    {
+      "intent":"ModeIntent",
+      "slots":[
+          {
+            "name": "Mode",
+            "type": "LIST_OF_MODES"
+          }
+      ]
+    },
+    {
+      "intent":"AMAZON.HelpIntent"
+    },
+    {
+      "intent":"AMAZON.CancelIntent"
+    },
+    {
+      "intent":"AMAZON.StopIntent"
+    }
+  ]
+}
