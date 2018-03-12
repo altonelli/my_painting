@@ -1,10 +1,11 @@
-import events
-import logging
+import os
 
-logger = logging.getLogger(__name__)
+import events
+
+alexa_id = os.environ.get('AWS_ALEXA_SKILLS_KIT_ID')
 
 def lambda_handler(event, context):
-    logger.info("event.session.application.applicationId=" +
+    print("event.session.application.applicationId=" +
           event['session']['application']['applicationId'])
     """
     Uncomment this if statement and populate with your skill's application ID to
@@ -12,7 +13,8 @@ def lambda_handler(event, context):
     function.
     """
     if (event['session']['application']['applicationId'] !=
-            "amzn1.echo-sdk-ams.app.{0}".format(AWS_ALEXA_SKILLS_KIT_ID)):
+            "amzn1.ask.skill.{0}".format(alexa_id)):
+        print("amzn1.ask.skill.{0}".format(alexa_id))
         raise ValueError("Invalid Application ID")
 
     # if event['session']['new']:

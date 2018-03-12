@@ -17,10 +17,8 @@ def get_help_response():
 def update_power_state(intent):
     card_title = "Power"
 
-    if
-
     power_state = intent.get('slots',{}).get('PowerState',{}).get('value')
-    if power_state and power_state in {'On', 'on', 'Off', 'off'}:
+    if power_state and (power_state.upper() == 'ON' or power_state.upper() == 'OFF'):
         speech_output = "Yes my lord."
         new_value_dict = {"power_state":power_state.upper()}
         shadow_updater.update_shadow(new_value_dict)
@@ -38,6 +36,7 @@ def update_brightness(intent):
     brightness = intent.get('slots',{}).get('Brightness',{}).get('value')
 
     if brightness:
+        brightness = int(brightness)
         if brightness > 0 and brightness <= 100:
             speech_output = "Yes my lord."
             new_value_dict = {"brightness":brightness}
@@ -47,8 +46,8 @@ def update_brightness(intent):
             new_value_dict = {"power_state":"OFF"}
             shadow_updater.update_shadow(new_value_dict)
         else:
-            speech_output = "I'm sorry that value is not in the proper range. "
-                + "Please give me a number between 0 and 100."
+            speech_output = "I'm sorry that value is not in the proper range. "\
+                "Please give me a number between 0 and 100."
     else:
         speech_output = "I did not understand that. Please repeat your request."
 
@@ -62,9 +61,11 @@ def update_mode(intent):
 
     mode = intent.get('slots',{}).get('Mode',{}).get('value')
 
-    if mode and mode in {"still", "Still", "Static", "static", "wave", "Wave"}:
+    if mode and mode.upper() in {"STILL", "STATIC", "WAVE"}:
+        if mode.upper() == "STILL":
+            mode = "STATIC"
         speech_output = "Yes my lord."
-        new_value_dict = {"mode":mode}
+        new_value_dict = {"mode":mode.upper()}
         shadow_updater.update_shadow(new_value_dict)
     else:
         speech_output = "I did not understand that. Please repeat your request."

@@ -1,22 +1,21 @@
 import behaviors
 
-logger = logging.getLogger(__name__)
 
 def on_session_started(session_started_request, session):
-    logger.info("on_session_started requestId=" + session_started_request['requestId']
+    print("on_session_started requestId=" + session_started_request['requestId']
           + ", sessionId=" + session['sessionId'])
 
 def on_launch(launch_request, session):
     """ Called when the user launches the skill without specifying what they
     want
     """
-    logger.info("on_launch requestId=" + launch_request['requestId'] +
+    print("on_launch requestId=" + launch_request['requestId'] +
           ", sessionId=" + session['sessionId'])
     return behaviors.get_help_response()
 
 def on_intent(intent_request, session):
     """ Called when the user specifies an intent for this skill """
-    logger.info("on_intent requestId=" + intent_request['requestId'] +
+    print("on_intent requestId=" + intent_request['requestId'] +
           ", sessionId=" + session['sessionId'])
 
     intent = intent_request['intent']
@@ -39,5 +38,5 @@ def on_session_ended(session_ended_request, session):
 
     Is not called when the skill returns should_end_session=true
     """
-    logger.info("on_session_ended requestId=" + session_ended_request['requestId'] +
+    print("on_session_ended requestId=" + session_ended_request['requestId'] +
           ", sessionId=" + session['sessionId'])
