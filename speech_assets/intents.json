@@ -1,40 +1,103 @@
 {
-  "intents": [
-    {
-      "intent":"PowerStateIntent",
-      "slots":[
+    "languageModel": {
+        "invocationName": "my painting",
+        "intents": [
           {
-            "name": "PowerState",
-            "type": "LIST_OF_POWER_STATES"
-          }
-      ]
-    },
-    {
-      "intent":"BrightnessIntent",
-      "slots":[
+            "name":"PowerStateIntent",
+            "slots":[
+                {
+                  "name": "PowerState",
+                  "type": "LIST_OF_POWER_STATES"
+                }
+            ],
+            "samples":[
+                "turn {PowerState} my painting",
+                "turn {PowerState} the lights"
+            ]
+          },
           {
-            "name": "Brightness",
-            "type": "AMAZON.NUMBERS"
-          }
-      ]
-    },
-    {
-      "intent":"ModeIntent",
-      "slots":[
+            "name":"BrightnessIntent",
+            "slots":[
+                {
+                  "name": "Brightness",
+                  "type": "AMAZON.NUMBERS"
+                }
+            ],
+            "samples": [
+                    "set my painting to {Brightness} percent",
+                    "set the lights to {Brightness} percent",
+                    "set my painting to {Brightness}",
+                    "set the lights to {Brightness}"
+                ]
+          },
           {
-            "name": "Mode",
-            "type": "LIST_OF_MODES"
+            "name":"ModeIntent",
+            "slots":[
+                {
+                  "name": "Mode",
+                  "type": "LIST_OF_MODES"
+                }
+            ],
+            "samples":[
+                "set the lights to {Mode}",
+                "set my painting to {Mode}"
+            ]
+          },
+          {
+              "name": "AMAZON.HelpIntent",
+              "slots": [],
+              "samples": []
+          },
+          {
+              "name": "AMAZON.CancelIntent",
+              "slots": [],
+              "samples": []
+          },
+          {
+              "name": "AMAZON.StopIntent",
+              "slots": [],
+              "samples": []
           }
-      ]
+        ]
     },
-    {
-      "intent":"AMAZON.HelpIntent"
-    },
-    {
-      "intent":"AMAZON.CancelIntent"
-    },
-    {
-      "intent":"AMAZON.StopIntent"
-    }
-  ]
+    "types": [
+        {
+            "name": "LIST_OF_MODES",
+            "values": [
+                {
+                    "id": "",
+                    "name": {
+                        "value": "STATIC",
+                        "synonyms": ["STILL"]
+                    }
+                },
+                {
+                    "id": "",
+                    "name": {
+                        "value": "WAVE",
+                        "synonyms": []
+                    }
+                }
+            ]
+        },
+        {
+            "name": "LIST_OF_POWER_STATES",
+            "values": [
+                {
+                    "id": "",
+                    "name": {
+                        "value": "ON",
+                        "synonyms": []
+                    }
+                },
+                {
+                    "id": "",
+                    "name": {
+                        "value": "OFF",
+                        "synonyms": []
+                    }
+                }
+            ]
+        }
+    ]
 }
