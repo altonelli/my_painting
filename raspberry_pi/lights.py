@@ -2,7 +2,7 @@ import time
 
 import pigpio
 
-from light_constants import *
+from light_values import *
 
 STATIC = "STATIC"
 WAVE = "WAVE"
