@@ -2,102 +2,104 @@
     "languageModel": {
         "invocationName": "my painting",
         "intents": [
-          {
-            "name":"PowerStateIntent",
-            "slots":[
-                {
-                  "name": "PowerState",
-                  "type": "LIST_OF_POWER_STATES"
-                }
-            ],
-            "samples":[
-                "turn {PowerState} my painting",
-                "turn {PowerState} the lights"
-            ]
-          },
-          {
-            "name":"BrightnessIntent",
-            "slots":[
-                {
-                  "name": "Brightness",
-                  "type": "AMAZON.NUMBERS"
-                }
-            ],
-            "samples": [
+            {
+                "name": "PowerStateIntent",
+                "slots": [
+                    {
+                        "name": "PowerState",
+                        "type": "LIST_OF_POWER_STATES"
+                    }
+                ],
+                "samples": [
+                    "turn {PowerState} my painting",
+                    "turn {PowerState} the lights"
+                ]
+            },
+            {
+                "name": "BrightnessIntent",
+                "slots": [
+                    {
+                        "name": "Brightness",
+                        "type": "AMAZON.NUMBER"
+                    }
+                ],
+                "samples": [
                     "set my painting to {Brightness} percent",
                     "set the lights to {Brightness} percent",
                     "set my painting to {Brightness}",
                     "set the lights to {Brightness}"
                 ]
-          },
-          {
-            "name":"ModeIntent",
-            "slots":[
-                {
-                  "name": "Mode",
-                  "type": "LIST_OF_MODES"
-                }
-            ],
-            "samples":[
-                "set the lights to {Mode}",
-                "set my painting to {Mode}"
-            ]
-          },
-          {
-              "name": "AMAZON.HelpIntent",
-              "slots": [],
-              "samples": []
-          },
-          {
-              "name": "AMAZON.CancelIntent",
-              "slots": [],
-              "samples": []
-          },
-          {
-              "name": "AMAZON.StopIntent",
-              "slots": [],
-              "samples": []
-          }
+            },
+            {
+                "name": "ModeIntent",
+                "slots": [
+                    {
+                        "name": "Mode",
+                        "type": "LIST_OF_MODES"
+                    }
+                ],
+                "samples": [
+                    "set the lights to {Mode}",
+                    "set my painting to {Mode}"
+                ]
+            },
+            {
+                "name": "AMAZON.HelpIntent",
+                "slots": [],
+                "samples": []
+            },
+            {
+                "name": "AMAZON.CancelIntent",
+                "slots": [],
+                "samples": []
+            },
+            {
+                "name": "AMAZON.StopIntent",
+                "slots": [],
+                "samples": []
+            }
+        ],
+        "types": [
+            {
+                "name": "LIST_OF_POWER_STATES",
+                "values": [
+                    {
+                        "id": "",
+                        "name": {
+                            "value": "OFF",
+                            "synonyms": []
+                        }
+                    },
+                    {
+                        "id": "",
+                        "name": {
+                            "value": "ON",
+                            "synonyms": []
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "LIST_OF_MODES",
+                "values": [
+                    {
+                        "id": "",
+                        "name": {
+                            "value": "WAVE",
+                            "synonyms": []
+                        }
+                    },
+                    {
+                        "id": "",
+                        "name": {
+                            "value": "STILL",
+                            "synonyms": [
+                                "STATIC"
+                            ]
+                        }
+                    }
+                ]
+            }
         ]
-    },
-    "types": [
-        {
-            "name": "LIST_OF_MODES",
-            "values": [
-                {
-                    "id": "",
-                    "name": {
-                        "value": "STATIC",
-                        "synonyms": ["STILL"]
-                    }
-                },
-                {
-                    "id": "",
-                    "name": {
-                        "value": "WAVE",
-                        "synonyms": []
-                    }
-                }
-            ]
-        },
-        {
-            "name": "LIST_OF_POWER_STATES",
-            "values": [
-                {
-                    "id": "",
-                    "name": {
-                        "value": "ON",
-                        "synonyms": []
-                    }
-                },
-                {
-                    "id": "",
-                    "name": {
-                        "value": "OFF",
-                        "synonyms": []
-                    }
-                }
-            ]
-        }
-    ]
+    }
 }
