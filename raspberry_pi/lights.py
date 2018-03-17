@@ -130,4 +130,3 @@ if __name__ == '__main__':
         'mode': STATIC
     }
     light.update_lights(light_data_4)
-    return 0
