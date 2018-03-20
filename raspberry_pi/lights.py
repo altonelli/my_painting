@@ -25,7 +25,7 @@ class Light(object):
         super(Light, self).__init__()
         self.previous_brightness = 100
         self.brightness = 100
-        self.color = CANDLE
+        self.color = NATURALISH
         self.mode = STATIC
         self.power_state = "OFF"
 
