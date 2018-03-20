@@ -82,7 +82,7 @@ class Light(object):
         final_color = RGB(r=int(self.color.r * (self.brightness/100.0)),
                          g=int(self.color.g * (self.brightness/100.0)),
                          b=int(self.color.b * (self.brightness/100.0)))
-        self._update_color(self.color)
+        self._update_color(final_color)
 
     def _update_color(self, rgb_tuple):
         for color in rgb_tuple._fields:
