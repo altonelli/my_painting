@@ -70,18 +70,18 @@ class Light(object):
 
     def _update_brightness(self):
         while self.previous_brightness != self.brightness:
-            next_color = RGB(r=int(self.color.r * (self.previous_brightness/100)),
-                             g=int(self.color.g * (self.previous_brightness/100)),
-                             b=int(self.color.b * (self.previous_brightness/100)))
+            next_color = RGB(r=int(self.color.r * (self.previous_brightness/100.0)),
+                             g=int(self.color.g * (self.previous_brightness/100.0)),
+                             b=int(self.color.b * (self.previous_brightness/100.0)))
             self._update_color(next_color)
             diff = self.brightness - self.previous_brightness
             # adjust previous brightness to +/- 1
             self.previous_brightness = self.previous_brightness + \
                 (diff) / abs(diff)
             time.sleep(.05)
-        final_color = RGB(r=int(self.color.r * (self.brightness/100)),
-                         g=int(self.color.g * (self.brightness/100)),
-                         b=int(self.color.b * (self.brightness/100)))
+        final_color = RGB(r=int(self.color.r * (self.brightness/100.0)),
+                         g=int(self.color.g * (self.brightness/100.0)),
+                         b=int(self.color.b * (self.brightness/100.0)))
         self._update_color(self.color)
 
     def _update_color(self, rgb_tuple):
