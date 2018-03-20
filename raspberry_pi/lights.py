@@ -7,9 +7,9 @@ from light_values import *
 STATIC = "STATIC"
 WAVE = "WAVE"
 
-R_PIN = 17
-G_PIN = 22
-B_PIN = 4
+R_PIN = 4
+G_PIN = 17
+B_PIN = 22
 
 PINS = RGB(r=R_PIN, g=G_PIN, b=B_PIN)
 
