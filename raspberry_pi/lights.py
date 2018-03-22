@@ -4,16 +4,11 @@ import pigpio
 
 from light_values import *
 
-STATIC = "STATIC"
-WAVE = "WAVE"
-
 R_PIN = 4
 G_PIN = 17
 B_PIN = 22
 
 PINS = RGB(r=R_PIN, g=G_PIN, b=B_PIN)
-
-VCC = 10
 
 OFF = RGB(r=0, g=0, b=0)
 
@@ -26,7 +21,6 @@ class Light(object):
         self.previous_brightness = 100
         self.brightness = 100
         self.color = NATURALISH
-        self.mode = STATIC
         self.power_state = "OFF"
 
         self.pi = pigpio.pi()
@@ -35,12 +29,10 @@ class Light(object):
         return {
                    'power_state': self.power_state,
                    'brightness': self.brightness,
-                   'mode': self.mode
                }
 
     def needs_updating(self, light_data):
         if light_data.get('brightness') != self.brightness \
-        or light_data.get('mode') != self.mode \
         or light_data.get('power_state') != self.power_state:
             return True
         return False
@@ -48,7 +40,6 @@ class Light(object):
     def update_lights(self, light_data):
         self.previous_brightness = self.brightness
         self.brightness = light_data.get('brightness')
-        self.mode = light_data.get('mode')
         self.power_state = light_data.get('power_state')
         self._update_board()
 
@@ -65,7 +56,6 @@ class Light(object):
             # Case where called off
             self._update_color(OFF)
         print(self.brightness)
-        print(self.mode)
         print(self.power_state)
 
     def _update_brightness(self):
@@ -99,34 +89,29 @@ if __name__ == '__main__':
     light_data_0 = {
         'power_state': "ON",
         'brightness': 100,
-        'mode': STATIC
     }
     light.update_lights(light_data_0)
     time.sleep(3)
     light_data_1 = {
         'power_state': "ON",
         'brightness': 50,
-        'mode': STATIC
     }
     light.update_lights(light_data_1)
     time.sleep(7)
     light_data_2 = {
         'power_state': "ON",
         'brightness': 10,
-        'mode': STATIC
     }
     light.update_lights(light_data_2)
     time.sleep(10)
     light_data_3 = {
         'power_state': "ON",
         'brightness': 100,
-        'mode': STATIC
     }
     light.update_lights(light_data_3)
     time.sleep(7)
     light_data_4 = {
         'power_state': "OFF",
         'brightness': 100,
-        'mode': STATIC
     }
     light.update_lights(light_data_4)

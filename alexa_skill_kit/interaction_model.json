@@ -12,7 +12,9 @@
                 ],
                 "samples": [
                     "turn {PowerState} my painting",
-                    "turn {PowerState} the lights"
+                    "turn {PowerState} the lights",
+                    "turn my painting {PowerState}",
+                    "turn the lights {PowerState}"
                 ]
             },
             {
@@ -27,20 +29,11 @@
                     "set my painting to {Brightness} percent",
                     "set the lights to {Brightness} percent",
                     "set my painting to {Brightness}",
-                    "set the lights to {Brightness}"
-                ]
-            },
-            {
-                "name": "ModeIntent",
-                "slots": [
-                    {
-                        "name": "Mode",
-                        "type": "LIST_OF_MODES"
-                    }
-                ],
-                "samples": [
-                    "set the lights to {Mode}",
-                    "set my painting to {Mode}"
+                    "set the lights to {Brightness}",
+                    "dim my painting to {Brightness} percent",
+                    "dim the lights to {Brightness} percent",
+                    "dim my painting to {Brightness}",
+                    "dim the lights to {Brightness}"
                 ]
             },
             {
@@ -75,27 +68,6 @@
                         "name": {
                             "value": "ON",
                             "synonyms": []
-                        }
-                    }
-                ]
-            },
-            {
-                "name": "LIST_OF_MODES",
-                "values": [
-                    {
-                        "id": "",
-                        "name": {
-                            "value": "WAVE",
-                            "synonyms": []
-                        }
-                    },
-                    {
-                        "id": "",
-                        "name": {
-                            "value": "STILL",
-                            "synonyms": [
-                                "STATIC"
-                            ]
                         }
                     }
                 ]

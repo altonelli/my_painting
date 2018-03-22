@@ -55,22 +55,3 @@ def update_brightness(intent):
         response_builders.build_speechlet_response(card_title,
         speech_output, reprompt_text, should_end_session))
     return response
-
-def update_mode(intent):
-    card_title = "Mode"
-
-    mode = intent.get('slots',{}).get('Mode',{}).get('value')
-
-    if mode and mode.upper() in {"STILL", "STATIC", "WAVE"}:
-        if mode.upper() == "STILL":
-            mode = "STATIC"
-        speech_output = "Yes my lord."
-        new_value_dict = {"mode":mode.upper()}
-        shadow_updater.update_shadow(new_value_dict)
-    else:
-        speech_output = "I did not understand that. Please repeat your request."
-
-    response = response_builders.build_response(session_attributes,
-        response_builders.build_speechlet_response(card_title,
-        speech_output, reprompt_text, should_end_session))
-    return response

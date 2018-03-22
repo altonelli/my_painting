@@ -25,8 +25,6 @@ def on_intent(intent_request, session):
         return behaviors.update_power_state(intent)
     elif intent_name == "BrightnessIntent":
         return behaviors.update_brightness(intent)
-    elif intent_name == "ModeIntent":
-        return behaviors.update_mode(intent)
     elif intent_name == "AMAZON.HelpIntent":
         return behaviors.get_help_response()
     elif intent_name == "AMAZON.CancelIntent" or \

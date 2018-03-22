@@ -5,7 +5,6 @@ import json
 import boto3
 
 
-clientId = os.environ.get('AWS_IOT_MQTT_CLIENT_ID')
 thingName = os.environ.get("AWS_IOT_MY_THING_NAME")
 host = os.environ.get("AWS_IOT_MQTT_HOST")
 port = os.environ.get("AWS_IOT_MQTT_PORT_UPDATE")
@@ -24,4 +23,3 @@ def update_shadow(new_value_dict):
     res_payload = json.loads(response['payload'].read().decode('utf-8'))
     print("PowerState: {0}".format(res_payload.get("state").get("desired").get("power_state")))
     print("Brightness: {0}".format(res_payload.get("state").get("desired").get("brightness")))
-    print("Mode: {0}".format(res_payload.get("state").get("desired").get("mode")))
