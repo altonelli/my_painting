@@ -49,7 +49,7 @@ METAL_HALIDE = RGB(242, 252, 255)
 HIGH_PRESSURE_SODIUM = RGB(255, 183, 76)
 
 ## My colors
-# Naturalish
+# Natural lighting based on my room
 NATURALISH = RGB(240,150,20)
-
+# Warmer, more yellow light
 YELLOWISH = RGB(240,180,20)

@@ -1,3 +1,6 @@
+"""
+Connection between the Raspberry Pi and the AWS IoT Shadow endpoint.
+"""
 import os
 import logging
 import time
@@ -30,6 +33,7 @@ publicKeyPath = os.environ.get("AWS_IOT_PUBLIC_KEY_FILENAME")
 thingName = os.environ.get("AWS_IOT_MY_THING_NAME")
 clientId = os.environ.get("AWS_IOT_MQTT_CLIENT_ID")
 
+# topic strings
 get_topic = "$aws/things/{0}/shadow/get".format(thingName)
 update_topic = "$aws/things/{0}/shadow/update".format(thingName)
 
@@ -43,6 +47,10 @@ logger.addHandler(streamHandler)
 
 
 class MyPaintingShadowClient():
+    """
+    Client to maintain a connection between the Raspberry Pi and the IoT
+    Shadow. Updates LED lights through a Light object.
+    """
     def __init__(self):
         self.light = Light()
 
@@ -51,9 +59,18 @@ class MyPaintingShadowClient():
 
         self.deviceShadowHandler = self.shadowClient.createShadowHandlerWithName(thingName, True)
 
-
     def _get_shadow_client(self):
+        """
+        Creates, configures, and sets AWSIoTMQTTShadowClient to communicate
+        with AWS IoT Thing Shadow.
+
+        Args:
+            None
+        Returns:
+            AWSIoTMQTTShadowClient
+        """
         self.shadowClient = AWSIoTMQTTShadowClient(clientId)
+        # Client configurations
         self.shadowClient.configureEndpoint(host, port)
         self.shadowClient.configureCredentials(rootCAPath,
                                                privateKeyPath,
@@ -61,23 +78,43 @@ class MyPaintingShadowClient():
         self.shadowClient.configureAutoReconnectBackoffTime(1, 32, 20)
         self.shadowClient.configureConnectDisconnectTimeout(10)
         self.shadowClient.configureMQTTOperationTimeout(5)
+        # Set online/offline callbacks before connecting
         self.shadowClient.onOnline = self._on_online
         self.shadowClient.onOffline = self._on_offline
         return self.shadowClient
 
     def _update_shadow_callback(self, payload, response_status, token):
+        """
+        Callback after updating shadow. Logs new reported state from payload.
+        If there is no payload, will except the ValueException and pass through.
+
+        Args:
+            payload: JSON dict of shadow state
+            response_status: string
+            token: string
+        """
         logger.info(response_status)
         try:
             payload_dict = json.loads(payload)
             light_data = payload_dict['state']['reported']
-            print('reported_power_state: {}'.format(light_data.get('power_state')))
-            print('reported_brightness: {}'.format(light_data.get('brightness')))
-            print('reported_mode: {}'.format(light_data.get('mode')))
+            logger.info('reported_power_state: {}'.format(light_data.get('power_state')))
+            logger.info('reported_brightness: {}'.format(light_data.get('brightness')))
+            logger.info('reported_mode: {}'.format(light_data.get('mode')))
         except:
             pass
 
-    # Shadow callback from AWS IOT ShadowGet
     def _get_shadow_callback(self, payload, response_status, token):
+        """
+        Callback after getting shadow. Checks if Light object needs to be
+        updated based off of the payload. Updates the lights and sends an
+        update to the IoT shadow if Lights object needs to be updates. If
+        there is no payload, will except the ValueException and pass through.
+
+        Args:
+            payload: JSON dict of shadow state
+            response_status: string
+            token: string
+        """
         logger.info(response_status)
         try:
             payload_dict = json.loads(payload)
@@ -94,10 +131,20 @@ class MyPaintingShadowClient():
                                                       self._update_shadow_callback,
                                                       10)
         except:
+            # may add reconnect if no json payload present
             # self._reconnect()
             pass
 
-    def run_app(self, first_time=False):
+    def run_app(self, set_desired=False):
+        """
+        Connects to IoT Shadow through MQTT connection. Updates "reported"
+        state of shadow with current settings. Updates "desired" state if
+        set_desired is True. Gets Shadow state every one second and handles
+        callback with _get_shadow_callback.
+
+        Args:
+            set_desired: boolean to send update to desired state
+        """
         self.shadowClient.connect()
         self.is_connected = True
         start_payload = {
@@ -105,7 +152,8 @@ class MyPaintingShadowClient():
                                 'reported': self.light.current_settings()
                             }
                         }
-        if first_time:
+        # Only update the desire
+        if set_desired:
             start_payload['state']['desired'] = self.light.current_settings()
         JSON_payload = json.dumps(start_payload)
         self.deviceShadowHandler.shadowUpdate(JSON_payload,
@@ -116,13 +164,33 @@ class MyPaintingShadowClient():
             time.sleep(1)
 
     def _on_online(self):
-        print("ON ONLINE")
+        """
+        Logs when connection is online.
+
+        Args:
+            None
+        """
+        logger.info("ONLINE")
 
     def _on_offline(self):
-        print("ON OFFLINE")
+        """
+        Logs when connection is offline. Calls _reconnect to reestablish
+        connection.
+
+        Args:
+            None
+        """
+        logger.info("OFFLINE")
         self._reconnect()
 
     def _reconnect(self):
+        """
+        Reestablishes MQTT connection. Calls run_app again.
+
+        Args:
+            None
+        """
+        # TODO: Reestablish connection without recursive call to stack.
         self.shadowClient.disconnect()
         self.is_connected = False
 
@@ -131,8 +199,15 @@ class MyPaintingShadowClient():
 
 
 def main():
+    """
+    Starts shadow client and starts listening to shadow.
+
+    Args:
+        None
+    """
     my_painting_shadow_client = MyPaintingShadowClient()
-    my_painting_shadow_client.run_app(first_time=True)
+    # set desired state upon initial start up.
+    my_painting_shadow_client.run_app(set_desired=True)
 
 
 if __name__ == '__main__':

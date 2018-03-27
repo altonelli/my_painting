@@ -54,7 +54,6 @@ AWS_IOT_MQTT_PORT=8883
 AWS_IOT_MQTT_PORT_UPDATE=8443
 AWS_IOT_MQTT_CLIENT_ID="my_painting"
 AWS_IOT_MY_THING_NAME="my_painting"
-AWS_IOT_BROKER_REGION="us-east-1"
 #Alexa Skill Information
 AWS_ALEXA_SKILLS_KIT_ID="amzn1.ask.skill.XXXXX"
 ```
@@ -95,7 +94,7 @@ You will likely want to run the code on the so that you can close your
 terminal or ssh client and allow the code to continue to run. Run it in the
 background with nohup.
 ```
-$ nohup python ./raspberry_pi/shadow_listener.py &
+$ nohup python ./raspberry_pi/shadow_client.py &
 ```
 
 ## Contributing
