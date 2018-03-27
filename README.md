@@ -70,11 +70,11 @@ especially if you are going to be reusing the Pi.
 You'll need the C pigpio library to use the Python pigpio library. Run
 the following command.
 ```
-sudo apt-get install pigpio
+$ sudo apt-get install pigpio
 ```
 With your virtual environment set up, install all dependencies.
 ```
-$ pip install -r requirements.txt
+$ pip install -r raspberry_pi/requirements.txt
 ```
 To use the pigpio library, a pigpio daemon has to be set up. To do this
 run the following command after starting up the Pi.
@@ -87,7 +87,7 @@ $ sudo killall pigpiod
 ```
 You will likely want the daemon to start on boot. To do so, run
 ```
-sudo systemctl enable pigpiod
+$ sudo systemctl enable pigpiod
 ```
 
 ### Running the Python script
@@ -97,3 +97,7 @@ background with nohup.
 ```
 $ nohup python ./raspberry_pi/shadow_listener.py &
 ```
+
+## Contributing
+If you would like to contribute, whether to add a feature or correct a bug,
+feel free to fork the repo and make a PR.

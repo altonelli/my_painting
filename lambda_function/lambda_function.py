@@ -1,31 +1,47 @@
+"""
+Main lambda function handler. The AWS Lambda function should point here to
+lambda_function.lambda_handler. Acts on request and session information
+through event_actions.
+"""
 import os
 
-import events
+import event_actions
 
 alexa_id = os.environ.get('AWS_ALEXA_SKILLS_KIT_ID')
 
 def lambda_handler(event, context):
+    """
+    Handles event and request from Alexa Skill by using methods form
+    the event_actions module.
+
+    Args:
+        event: Python dict of event, request, and session data
+        context: LambdaContext containing runtime data
+    Returns:
+        Python dict of response message
+    Rasies:
+        ValueError
+    """
     print("event.session.application.applicationId=" +
           event['session']['application']['applicationId'])
-    """
-    Uncomment this if statement and populate with your skill's application ID to
-    prevent someone else from configuring a skill that sends requests to this
-    function.
-    """
+
+    # Ensure that request is from our skill
     if (event['session']['application']['applicationId'] !=
             "amzn1.ask.skill.{0}".format(alexa_id)):
         print("amzn1.ask.skill.{0}".format(alexa_id))
         raise ValueError("Invalid Application ID")
 
+    # Uncomment if storing information in sessions
     # if event['session']['new']:
-    #     events.on_session_started({'requestId': event['request']['requestId']},
+    #     event_actions.on_session_started({'requestId': event['request']['requestId']},
     #                        event['session'])
 
     request_type = event['request']['type']
 
     if request_type == "LaunchRequest":
-        return events.on_launch(event['request'], event['session'])
+        return event_actions.on_launch(event['request'], event['session'])
     elif request_type == "IntentRequest":
-        return events.on_intent(event['request'], event['session'])
+        return event_actions.on_intent(event['request'], event['session'])
+    # Uncomment if storing information in sessions
     # elif request_type == "SessionEndedRequest":
-    #     return on_session_ended(event['request'], event['session'])
+    #     return event_actions.on_session_ended(event['request'], event['session'])
