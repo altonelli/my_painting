@@ -7,7 +7,7 @@ import time
 import json
 import argparse
 
-from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient, AWSIoTMQTTShadowClient
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
 from lights import Light
 
@@ -35,8 +35,8 @@ thingName = os.environ.get("AWS_IOT_MY_THING_NAME")
 clientId = os.environ.get("AWS_IOT_MQTT_CLIENT_ID")
 
 # topic strings
-get_topic = "$aws/things/{0}/shadow/get".format(thingName)
 update_topic = "$aws/things/{0}/shadow/update".format(thingName)
+update_docs_topic = "$aws/things/{0}/shadow/update/documents".format(thingName)
 
 # Logger information
 logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ streamHandler.setFormatter(formatter)
 logger.addHandler(streamHandler)
 
 
-class MyPaintingShadowClient():
+class MyPaintingMQTTClient():
     """
     Client to maintain a connection between the Raspberry Pi and the IoT
     Shadow. Updates LED lights through a Light object.
@@ -57,19 +57,17 @@ class MyPaintingShadowClient():
 
         self._get_shadow_client()
 
-        self.deviceShadowHandler = self.shadowClient.createShadowHandlerWithName(thingName, True)
-
     def _get_shadow_client(self):
         """
-        Creates, configures, and sets AWSIoTMQTTShadowClient to communicate
-        with AWS IoT Thing Shadow.
+        Creates, configures, and sets AWSIoTMQTTClient to communicate
+        with AWS IoT Thing.
 
         Args:
             None
         Returns:
-            AWSIoTMQTTShadowClient
+            AWSIoTMQTTClient
         """
-        self.shadowClient = AWSIoTMQTTShadowClient(clientId)
+        self.shadowClient = AWSIoTMQTTClient(clientId)
         # Client configurations
         self.shadowClient.configureEndpoint(host, port)
         self.shadowClient.configureCredentials(rootCAPath,
@@ -83,45 +81,26 @@ class MyPaintingShadowClient():
         self.shadowClient.onOffline = self._on_offline
         return self.shadowClient
 
-    def _update_shadow_callback(self, payload, response_status, token):
+    def _update_subscribe_callback(self, client, userdata, message):
         """
-        Callback after updating shadow. Logs new reported state from payload.
-        If there is no payload, will except ValueError and exceptions and log.
+        Callback after subscribe to udate documents topic. Retrieves the
+        payload from the MQTTMessage and checks if Light object needs to
+        be updated. If Lights object needs to be updated, updates the lights
+        and sends an update to the IoT shadow. Will except ValueError and
+        exceptions and log.
+
+        Client and Userdata may be deprecated in the future.
 
         Args:
-            payload: JSON dict of shadow state
-            response_status: string
-            token: string
+            client: string
+            userdata: string
+            message: MQTTMessage instance
         """
-        logger.info(response_status)
+        logger.info('Message recieved from {} topic'.format(message.topic))
+        payload = message.payload
         try:
             payload_dict = json.loads(payload)
-            light_data = payload_dict['state']['reported']
-            logger.info('reported_power_state: {}'.format(light_data.get('power_state')))
-            logger.info('reported_brightness: {}'.format(light_data.get('brightness')))
-            logger.info('reported_mode: {}'.format(light_data.get('mode')))
-        except ValueError:
-            logger.error('Value error')
-            logger.info(payload)
-        except Exception as e:
-            logger.error(e.message)
-
-    def _get_shadow_callback(self, payload, response_status, token):
-        """
-        Callback after getting shadow. Checks if Light object needs to be
-        updated based off of the payload. Updates the lights and sends an
-        update to the IoT shadow if Lights object needs to be updates. If
-        there is no payload, will except ValueError and exceptions and log.
-
-        Args:
-            payload: JSON dict of shadow state
-            response_status: string
-            token: string
-        """
-        logger.info(response_status)
-        try:
-            payload_dict = json.loads(payload)
-            light_data = payload_dict['state']['desired']
+            light_data = payload_dict['current']['state']['desired']
             if self.light.needs_updating(light_data):
                 self.light.update_lights(light_data)
                 reported_payload = {
@@ -130,21 +109,19 @@ class MyPaintingShadowClient():
                                        }
                                    }
                 JSON_payload = json.dumps(reported_payload)
-                self.deviceShadowHandler.shadowUpdate(JSON_payload,
-                                                      self._update_shadow_callback,
-                                                      10)
+                self.shadowClient.publish(update_topic, JSON_payload, 0)
         except ValueError:
             logger.error('Value error')
             logger.info(payload)
         except Exception as e:
             logger.error(e.message)
 
-    def run_app(self, set_desired=False):
+    def run_app(self, set_desired_state=False):
         """
         Connects to IoT Shadow through MQTT connection. Updates "reported"
         state of shadow with current settings. Updates "desired" state if
-        set_desired is True. Gets Shadow state every one second and handles
-        callback with _get_shadow_callback.
+        set_desired is True. Gets Shadow state from update/documents topic
+        handles callback with _update_subscribe_callback.
 
         Args:
             set_desired: boolean to send update to desired state
@@ -156,16 +133,14 @@ class MyPaintingShadowClient():
                             }
                         }
         # Only update the desired state if true
-        if set_desired:
+        if set_desired_state:
             start_payload['state']['desired'] = self.light.current_settings()
         JSON_payload = json.dumps(start_payload)
-        self.deviceShadowHandler.shadowUpdate(JSON_payload,
-                                              self._update_shadow_callback,
-                                              10)
+        self.shadowClient.publish(update_topic, JSON_payload, 0)
+        self.shadowClient.subscribe(update_docs_topic, 1,
+                                    self._update_subscribe_callback)
         while True:
-            self.deviceShadowHandler.shadowGet(self._get_shadow_callback, 10)
-            # self.shadowClient.subscribe(get_topic, 1, customCallback)
-            time.sleep(1)
+            pass
 
     def _on_online(self):
         """
@@ -185,27 +160,17 @@ class MyPaintingShadowClient():
         """
         logger.info("OFFLINE")
 
-    def _reconnect(self):
-        """
-        Reestablishes MQTT connection.
 
-        Args:
-            None
-        """
-        self.shadowClient.disconnect()
-        self.shadowClient.connect()
-
-
-def main(set_desired):
+def main(set_desired_state):
     """
     Starts shadow client and starts listening to shadow.
 
     Args:
         None
     """
-    my_painting_shadow_client = MyPaintingShadowClient()
+    my_painting_mqtt_client = MyPaintingMQTTClient()
     # set desired state upon initial start up.
-    my_painting_shadow_client.run_app(set_desired)
+    my_painting_mqtt_client.run_app(set_desired_state)
 
 
 if __name__ == '__main__':
@@ -213,5 +178,5 @@ if __name__ == '__main__':
                                                  'state upon start up')
     parser.add_argument('--set_desired', dest='set_desired', action='store_true')
     args = parser.parse_args()
-    set_desired = args.set_desired
-    main(set_desired)
+    set_desired_state = args.set_desired
+    main(set_desired_state)

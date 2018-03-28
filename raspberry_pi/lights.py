@@ -7,7 +7,7 @@ import logging
 
 import pigpio
 
-from light_values import *
+from light_values import RGB, NATURALISH
 
 # Respective Gpio ports
 R_PIN = 4
