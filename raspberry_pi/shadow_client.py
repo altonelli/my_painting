@@ -13,15 +13,18 @@ from lights import Light
 
 # Shadow JSON schema:
 #
-# Name: MyPainting
+# Name: my_painting
 # {
 #	"state": {
 #		"desired":{
 #			"brightness":<int>,
-#           "mode":<str>,
+#           "power_state":<str>
+#		},
+#       "reported":{
+#           "brightness":<int>,
 #           "power_state":<str>
 #		}
-#	}
+#	 }
 # }
 
 # Set variables from env
@@ -83,11 +86,11 @@ class MyPaintingMQTTClient():
 
     def _update_subscribe_callback(self, client, userdata, message):
         """
-        Callback after subscribe to udate documents topic. Retrieves the
+        Callback after subscribe to update documents topic. Retrieves the
         payload from the MQTTMessage and checks if Light object needs to
         be updated. If Lights object needs to be updated, updates the lights
         and sends an update to the IoT shadow. Will except ValueError and
-        exceptions and log.
+        exceptions and log if payload is missing.
 
         Client and Userdata may be deprecated in the future.
 
@@ -118,10 +121,10 @@ class MyPaintingMQTTClient():
 
     def run_app(self, set_desired_state=False):
         """
-        Connects to IoT Shadow through MQTT connection. Updates "reported"
-        state of shadow with current settings. Updates "desired" state if
-        set_desired is True. Gets Shadow state from update/documents topic
-        handles callback with _update_subscribe_callback.
+        Connects to IoT Shadow through MQTT connection. Updates state of
+        shadow with current light settings to update topic. Subscribes to
+        update/documents topic of thing shadow from update/documents topic
+        and handles callback with _update_subscribe_callback.
 
         Args:
             set_desired: boolean to send update to desired state
@@ -129,12 +132,10 @@ class MyPaintingMQTTClient():
         self.shadowClient.connect()
         start_payload = {
                             'state': {
-                                'reported': self.light.current_settings()
+                                'reported': self.light.current_settings(),
+                                'desired': self.light.current_settings()
                             }
                         }
-        # Only update the desired state if true
-        if set_desired_state:
-            start_payload['state']['desired'] = self.light.current_settings()
         JSON_payload = json.dumps(start_payload)
         self.shadowClient.publish(update_topic, JSON_payload, 0)
         self.shadowClient.subscribe(update_docs_topic, 1,
@@ -142,41 +143,17 @@ class MyPaintingMQTTClient():
         while True:
             pass
 
-    def _on_online(self):
-        """
-        Logs when connection is online.
 
-        Args:
-            None
-        """
-        logger.info("ONLINE")
-
-    def _on_offline(self):
-        """
-        Logs when connection is offline.
-
-        Args:
-            None
-        """
-        logger.info("OFFLINE")
-
-
-def main(set_desired_state):
+def main():
     """
-    Starts shadow client and starts listening to shadow.
+    Starts shadow client and subscribes to shadow.
 
     Args:
         None
     """
     my_painting_mqtt_client = MyPaintingMQTTClient()
-    # set desired state upon initial start up.
-    my_painting_mqtt_client.run_app(set_desired_state)
+    my_painting_mqtt_client.run_app()
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Decide to update desired '
-                                                 'state upon start up')
-    parser.add_argument('--set_desired', dest='set_desired', action='store_true')
-    args = parser.parse_args()
-    set_desired_state = args.set_desired
-    main(set_desired_state)
+    main()
