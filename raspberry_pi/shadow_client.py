@@ -5,8 +5,9 @@ import os
 import logging
 import time
 import json
+import argparse
 
-from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTShadowClient
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient, AWSIoTMQTTShadowClient
 
 from lights import Light
 
@@ -55,7 +56,6 @@ class MyPaintingShadowClient():
         self.light = Light()
 
         self._get_shadow_client()
-        self.is_connected = False
 
         self.deviceShadowHandler = self.shadowClient.createShadowHandlerWithName(thingName, True)
 
@@ -77,7 +77,7 @@ class MyPaintingShadowClient():
                                                certificatePath)
         self.shadowClient.configureAutoReconnectBackoffTime(1, 32, 20)
         self.shadowClient.configureConnectDisconnectTimeout(10)
-        self.shadowClient.configureMQTTOperationTimeout(5)
+        self.shadowClient.configureMQTTOperationTimeout(1)
         # Set online/offline callbacks before connecting
         self.shadowClient.onOnline = self._on_online
         self.shadowClient.onOffline = self._on_offline
@@ -86,7 +86,7 @@ class MyPaintingShadowClient():
     def _update_shadow_callback(self, payload, response_status, token):
         """
         Callback after updating shadow. Logs new reported state from payload.
-        If there is no payload, will except the ValueException and pass through.
+        If there is no payload, will except ValueError and exceptions and log.
 
         Args:
             payload: JSON dict of shadow state
@@ -100,15 +100,18 @@ class MyPaintingShadowClient():
             logger.info('reported_power_state: {}'.format(light_data.get('power_state')))
             logger.info('reported_brightness: {}'.format(light_data.get('brightness')))
             logger.info('reported_mode: {}'.format(light_data.get('mode')))
-        except:
-            pass
+        except ValueError:
+            logger.error('Value error')
+            logger.info(payload)
+        except Exception as e:
+            logger.error(e.message)
 
     def _get_shadow_callback(self, payload, response_status, token):
         """
         Callback after getting shadow. Checks if Light object needs to be
         updated based off of the payload. Updates the lights and sends an
         update to the IoT shadow if Lights object needs to be updates. If
-        there is no payload, will except the ValueException and pass through.
+        there is no payload, will except ValueError and exceptions and log.
 
         Args:
             payload: JSON dict of shadow state
@@ -130,10 +133,11 @@ class MyPaintingShadowClient():
                 self.deviceShadowHandler.shadowUpdate(JSON_payload,
                                                       self._update_shadow_callback,
                                                       10)
-        except:
-            # may add reconnect if no json payload present
-            # self._reconnect()
-            pass
+        except ValueError:
+            logger.error('Value error')
+            logger.info(payload)
+        except Exception as e:
+            logger.error(e.message)
 
     def run_app(self, set_desired=False):
         """
@@ -146,21 +150,21 @@ class MyPaintingShadowClient():
             set_desired: boolean to send update to desired state
         """
         self.shadowClient.connect()
-        self.is_connected = True
         start_payload = {
                             'state': {
                                 'reported': self.light.current_settings()
                             }
                         }
-        # Only update the desire
+        # Only update the desired state if true
         if set_desired:
             start_payload['state']['desired'] = self.light.current_settings()
         JSON_payload = json.dumps(start_payload)
         self.deviceShadowHandler.shadowUpdate(JSON_payload,
                                               self._update_shadow_callback,
                                               10)
-        while self.is_connected:
+        while True:
             self.deviceShadowHandler.shadowGet(self._get_shadow_callback, 10)
+            # self.shadowClient.subscribe(get_topic, 1, customCallback)
             time.sleep(1)
 
     def _on_online(self):
@@ -174,31 +178,25 @@ class MyPaintingShadowClient():
 
     def _on_offline(self):
         """
-        Logs when connection is offline. Calls _reconnect to reestablish
-        connection.
+        Logs when connection is offline.
 
         Args:
             None
         """
         logger.info("OFFLINE")
-        self._reconnect()
 
     def _reconnect(self):
         """
-        Reestablishes MQTT connection. Calls run_app again.
+        Reestablishes MQTT connection.
 
         Args:
             None
         """
-        # TODO: Reestablish connection without recursive call to stack.
         self.shadowClient.disconnect()
-        self.is_connected = False
-
         self.shadowClient.connect()
-        self.run_app()
 
 
-def main():
+def main(set_desired):
     """
     Starts shadow client and starts listening to shadow.
 
@@ -207,8 +205,13 @@ def main():
     """
     my_painting_shadow_client = MyPaintingShadowClient()
     # set desired state upon initial start up.
-    my_painting_shadow_client.run_app(set_desired=True)
+    my_painting_shadow_client.run_app(set_desired)
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Decide to update desired '
+                                                 'state upon start up')
+    parser.add_argument('--set_desired', dest='set_desired', action='store_true')
+    args = parser.parse_args()
+    set_desired = args.set_desired
+    main(set_desired)

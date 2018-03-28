@@ -3,6 +3,7 @@ Logic between the Raspberry Pi and the LED light. Changes maintained through
 the Light object and the pigpio daemon connection.
 """
 import time
+import logging
 
 import pigpio
 
