@@ -8,8 +8,7 @@ can be found in my [Medium article](https://www.medium.com).
 The code should be well documented for a more technical look than the
 blog article touches upon. Some of the code for sessions in the Lambda
 function will be commented out. No data will be stored in sessions for
-this project, but I have left it there as reference if a developer decides
-to implement it.
+this project, but I have left it there as reference if a developer decides to implement it.
 
 The three directories correspond to where that code will be used. Likely, the
 only code that will be run by a developer's device will be on the
@@ -33,15 +32,13 @@ the lights.
 * Amazon Echo Dot
 
 ## Setup
-From the command line clone and cd in to the directory and create a .env file
-for environment variables.
+From the command line clone and cd in to the directory and create a .env file for environment variables.
 ```
 $ git clone https://github.com/altonelli/my_painting.git
-$ cd ~/<path_to_repos>/my_painting
+$ cd ~/<path_to_repo>/my_painting
 $ touch .env
 ```
-Edit the .env file to look like the following and set up your virtual
-environment to source the file.
+Edit the .env file to look like the following.
 ```
 #General AWS credentials for Pi
 AWS_IOT_CERTIFICATE_FILENAME="~/<path_to_credentials>/XXXXX-certificate.pem.crt"
@@ -58,45 +55,77 @@ AWS_IOT_MY_THING_NAME="my_painting"
 AWS_ALEXA_SKILLS_KIT_ID="amzn1.ask.skill.XXXXX"
 ```
 
-## AWS Lambda
+### AWS Lambda
+There is a bit of set up in AWS. Again look at [this blog](medium.com) for a detailed walk through of this.
+When inside the Lambda function console, zip and upload the code.
+```
+$ cd ~/<path_to_repo>/lambda_function/
+$ zip -r lambda_function.zip .
+```
+Then select upload in the console and upload the zip folder.
 
-## Raspberry Pi
-I recommend also setting up a virtual environment for the Raspberry Pi. I did
-so because I was developing and testing on it, but I recommend doing so
-especially if you are going to be reusing the Pi.
+### Raspberry Pi
+You will have to copy the certificates and keys to the Raspberry Pi once you have created them through AWS IoT. Then ssh to the Pi.
+```
+$ scp ~/<path_to_certs>/XXXXX-certificate.pem.crt pi@raspberrypi:~/.credentials/XXXXX-certificate.pem.crt
+$ scp ~/<path_to_certs>/XXXXX-private.pem.key pi@raspberrypi:~/.credentials/XXXXX-private.pem.key
+$ scp ~/<path_to_certs>/XXXXX-public.pem.key pi@raspberrypi:~/.credentials/XXXXX-public.pem.key
+$ scp ~/<path_to_certs>/root-ca.pem pi@raspberrypi:~/.credentials/root-ca.pem
+$ ssh pi@192.168.pi.ip
+```
+I recommend also setting up a virtual environment for the Raspberry Pi.
+Again, clone the repo, touch the .env file and edit it like above.
+```
+pi@raspberrypi:$ git clone https://github.com/altonelli/my_painting.git
+pi@raspberrypi:$ cd ~/<path_to_repo>/my_painting
+pi@raspberrypi:$ touch .env
+pi@raspberrypi:$ vi .env
+```
+With a virtualenv activated source the .env file (or add to your postactivate file)
+```
+pi@raspberrypi:$ set -a
+pi@raspberrypi:$ source ~/<path_to_repo>/.env
+pi@raspberrypi:$ set +a
+```
+Finally install all dependencies.
+```
+pi@raspberrypi:$ pip install -r raspberry_pi/requirements.txt
+```
 
-### The pigpio library
-You'll need the C pigpio library to use the Python pigpio library. Run
-the following command.
+### The Pigpio library
+You'll need the C pigpio library to use the Python pigpio library on the Pi. Run the following command.
 ```
-$ sudo apt-get install pigpio
-```
-With your virtual environment set up, install all dependencies.
-```
-$ pip install -r raspberry_pi/requirements.txt
+pi@raspberrypi:$ sudo apt-get install pigpio
 ```
 To use the pigpio library, a pigpio daemon has to be set up. To do this
 run the following command after starting up the Pi.
 ```
-$ sudo pigpiod
+pi@raspberrypi:$ sudo pigpiod
 ```
 If you ever need to destroy the daemon, run
 ```
-$ sudo killall pigpiod
+pi@raspberrypi:$ sudo killall pigpiod
 ```
 You will likely want the daemon to start on boot. To do so, run
 ```
-$ sudo systemctl enable pigpiod
+pi@raspberrypi:$ sudo systemctl enable pigpiod
 ```
 
-### Running the Python script
-You will likely want to run the code on the so that you can close your
-terminal or ssh client and allow the code to continue to run. Run it in the
-background with nohup.
+## Running the script
+### AWS Lambda
+Saving the function should enable it to be used.
+### Raspberry Pi
+Ensure that the Raspberry Pi has red wired to GPIO port 4, blue wired to port 17, and green wired to port 22. GPIO ports are different from the physical pin numbers.
+
+You will likely want to run the code on the so that you can close your terminal or ssh client and allow the code to continue to run. Run it in the background with nohup.
 ```
-$ nohup python ./raspberry_pi/shadow_client.py &
+pi@raspberrypi:$ nohup python ./raspberry_pi/shadow_client.py &
 ```
 
 ## Contributing
-If you would like to contribute, whether to add a feature or correct a bug,
-feel free to fork the repo and make a PR.
+If you would like to contribute, whether to add a feature or correct a bug, feel free to fork the repo and make a PR.
+
+## Acknowledgments
+* The [Amazon "Color Expert" demo app](https://github.com/awslabs/serverless-application-model/tree/master/examples/apps/alexa-skills-kit-color-expert-python) was helpful to write the core of the skill.
+* [Jay Proulx's tutorial](https://medium.com/@jay_proulx/headless-raspberry-pi-zero-w-setup-with-ssh-and-wi-fi-8ddd8c4d2742) was helpful in setting up the Raspberry Pi.
+* [David Ordnung's tutorial](https://dordnung.de/raspberrypi-ledstrip/) was extremely helpful in setting of the LED lights
