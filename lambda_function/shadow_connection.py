@@ -11,16 +11,16 @@ import boto3
 thingName = os.environ.get("AWS_IOT_MY_THING_NAME")
 host = os.environ.get("AWS_IOT_MQTT_HOST")
 port = os.environ.get("AWS_IOT_MQTT_PORT_UPDATE")
+topic = "$aws/things/{}/shadow/update".format(thingName)
 
 def update_shadow(new_value_dict):
     """
-    Updates IoT shadow's "desired" state with values from new_value_dict. Logs 
+    Updates IoT shadow's "desired" state with values from new_value_dict. Logs
     current "desired" state after update.
 
     Args:
         new_value_dict: Python dict of values to update in shadow
     """
-    topic = "$aws/things/{}/shadow/update".format(thingName)
     payload_dict = {
         "state": {
             "desired" : new_value_dict

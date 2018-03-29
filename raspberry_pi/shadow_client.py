@@ -71,7 +71,7 @@ class MyPaintingMQTTClient():
             AWSIoTMQTTClient
         """
         self.shadowClient = AWSIoTMQTTClient(clientId)
-        # Client configurations
+
         self.shadowClient.configureEndpoint(host, port)
         self.shadowClient.configureCredentials(rootCAPath,
                                                privateKeyPath,
@@ -79,12 +79,10 @@ class MyPaintingMQTTClient():
         self.shadowClient.configureAutoReconnectBackoffTime(1, 32, 20)
         self.shadowClient.configureConnectDisconnectTimeout(10)
         self.shadowClient.configureMQTTOperationTimeout(1)
-        # Set online/offline callbacks before connecting
-        self.shadowClient.onOnline = self._on_online
-        self.shadowClient.onOffline = self._on_offline
+        
         return self.shadowClient
 
-    def _update_subscribe_callback(self, client, userdata, message):
+    def _subscribe_update_callback(self, client, userdata, message):
         """
         Callback after subscribe to update documents topic. Retrieves the
         payload from the MQTTMessage and checks if Light object needs to
@@ -124,7 +122,7 @@ class MyPaintingMQTTClient():
         Connects to IoT Shadow through MQTT connection. Updates state of
         shadow with current light settings to update topic. Subscribes to
         update/documents topic of thing shadow from update/documents topic
-        and handles callback with _update_subscribe_callback.
+        and handles callback with _subscribe_update_callback.
 
         Args:
             set_desired: boolean to send update to desired state
@@ -139,7 +137,7 @@ class MyPaintingMQTTClient():
         JSON_payload = json.dumps(start_payload)
         self.shadowClient.publish(update_topic, JSON_payload, 0)
         self.shadowClient.subscribe(update_docs_topic, 1,
-                                    self._update_subscribe_callback)
+                                    self._subscribe_update_callback)
         while True:
             pass
 

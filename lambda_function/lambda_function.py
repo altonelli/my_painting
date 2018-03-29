@@ -1,7 +1,7 @@
 """
 Main lambda function handler. The AWS Lambda function should point here to
 lambda_function.lambda_handler. Acts on request and session information
-through event_actions.
+through event_actions. Code for sessions is left for reference. 
 """
 import os
 

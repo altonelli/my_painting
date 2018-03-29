@@ -102,15 +102,15 @@ class Light(object):
         else:
             # Case where called to switch off
             self._update_color(OFF)
-        logger.info(self.brightness)
         logger.info(self.power_state)
+        logger.info(self.brightness)
 
     def _update_brightness(self):
         """
-        Adjusts brightness level incrementally. Will begin from
-        current brightness even if brightness change in off state.
-        Gradually changes current brightness until equal to brightness
-        setting updating the lights with each change.
+        Adjusts brightness level incrementally. Will begin from current
+        brightness even if brightness change in off state. Gradually
+        changes current brightness until equal to brightness setting
+        updating the lights with each change.
 
         Args:
             None
@@ -127,8 +127,8 @@ class Light(object):
             time.sleep(.05)
         # Final update to exact brightness and default if no change in brightness setting
         final_color = RGB(r=int(self.color.r * (self.brightness/100.0)),
-                         g=int(self.color.g * (self.brightness/100.0)),
-                         b=int(self.color.b * (self.brightness/100.0)))
+                          g=int(self.color.g * (self.brightness/100.0)),
+                          b=int(self.color.b * (self.brightness/100.0)))
         self._update_color(final_color)
 
     def _update_color(self, rgb_tuple):
@@ -140,8 +140,12 @@ class Light(object):
             rgb_tuple: RGB tuple of colors to represent
         """
         for color in rgb_tuple._fields:
-            self.pi.set_PWM_dutycycle(getattr(PINS, color),
-                                      getattr(rgb_tuple, color))
+            pin = getattr(PINS, color)
+            value = getattr(rgb_tuple, color)
+            # Ensure color between 0 and 255
+            value = max(min(value, 255), 0)
+            # print(pin, value)
+            self.pi.set_PWM_dutycycle(pin, value)
 
 
 # Demo of fade effect for lights
