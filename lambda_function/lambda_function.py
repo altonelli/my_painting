@@ -1,7 +1,7 @@
 """
 Main lambda function handler. The AWS Lambda function should point here to
 lambda_function.lambda_handler. Acts on request and session information
-through event_actions. Code for sessions is left for reference. 
+through event_actions. Code for sessions is left for reference.
 """
 import os
 
@@ -27,8 +27,8 @@ def lambda_handler(event, context):
 
     # Ensure that request is from our skill
     if (event['session']['application']['applicationId'] !=
-            "amzn1.ask.skill.{0}".format(alexa_id)):
-        print("amzn1.ask.skill.{0}".format(alexa_id))
+            alexa_id):
+        print(alexa_id)
         raise ValueError("Invalid Application ID")
 
     # Uncomment if storing information in sessions

@@ -27,18 +27,18 @@ $ touch .env
 Edit the .env file to look like the following.
 ```
 #General AWS credentials for Pi
-AWS_IOT_CERTIFICATE_FILENAME="~/<path_to_credentials>/XXXXX-certificate.pem.crt"
-AWS_IOT_PRIVATE_KEY_FILENAME="~/<path_to_credentials>/XXXXX-private.pem.key"
-AWS_IOT_PUBLIC_KEY_FILENAME="~/<path_to_credentials>/XXXXX-public.pem.key"
-AWS_IOT_ROOT_CA_FILENAME="~/<path_to_credentials>/root-ca.pem"
+export AWS_IOT_CERTIFICATE_FILENAME="~/<path_to_credentials>/XXXXX-certificate.pem.crt"
+export AWS_IOT_PRIVATE_KEY_FILENAME="~/<path_to_credentials>/XXXXX-private.pem.key"
+export AWS_IOT_PUBLIC_KEY_FILENAME="~/<path_to_credentials>/XXXXX-public.pem.key"
+export AWS_IOT_ROOT_CA_FILENAME="~/<path_to_credentials>/root-ca.pem"
 #IoT Information
-AWS_IOT_MQTT_HOST="XXXXX.iot.us-east-1.amazonaws.com"
-AWS_IOT_MQTT_PORT=8883
-AWS_IOT_MQTT_PORT_UPDATE=8443
-AWS_IOT_MQTT_CLIENT_ID="my_painting"
-AWS_IOT_MY_THING_NAME="my_painting"
+export AWS_IOT_MQTT_HOST="XXXXX.iot.us-east-1.amazonaws.com"
+export AWS_IOT_MQTT_PORT=8883
+export AWS_IOT_MQTT_PORT_UPDATE=8443
+export AWS_IOT_MQTT_CLIENT_ID="my_painting"
+export AWS_IOT_MY_THING_NAME="my_painting"
 #Alexa Skill Information
-AWS_ALEXA_SKILLS_KIT_ID="amzn1.ask.skill.XXXXX"
+export AWS_ALEXA_SKILLS_KIT_ID="amzn1.ask.skill.XXXXX"
 ```
 
 ### AWS Lambda
@@ -69,9 +69,7 @@ pi@raspberrypi:$ vi .env
 ```
 With a virtualenv activated source the .env file (or add this to your postactivate file)
 ```
-pi@raspberrypi:$ set -a
 pi@raspberrypi:$ source ~/<path_to_repo>/.env
-pi@raspberrypi:$ set +a
 ```
 Finally install all dependencies.
 ```
