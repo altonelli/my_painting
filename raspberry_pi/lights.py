@@ -7,7 +7,7 @@ import logging
 
 import pigpio
 
-from light_values import RGB, NATURALISH
+from light_values import RGB, CANDLE
 
 # Respective Gpio ports
 R_PIN = 4
@@ -38,7 +38,7 @@ class Light(object):
         ## Default start up settings
         self.current_brightness = 100 # current display brightness
         self.brightness = 100 # brightness setting based on shadow
-        self.color = NATURALISH
+        self.color = CANDLE
         self.power_state = "OFF"
 
         # Establish connection to pigpio daemon
