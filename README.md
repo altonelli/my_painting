@@ -1,9 +1,9 @@
 # IoT Lights with Python, AWS, Alexa, and Raspberry Pi
 
 ### Background
-I have an old painting that can be lit with LED lights. After using numerous remote and battery powered lights I decided to build my own IoT LED lights that would response to Alexa. A fully blog and tutorial can be found in my [Medium article](https://www.medium.com). I hope this is helpful for any level of developer.
+I have an old painting that can be lit with LED lights. After using numerous remote and battery powered lights I decided to build my own IoT LED lights that would response to Alexa. A fully blog and tutorial can be found in my [Medium article](https://medium.com/@arthurltonelli/building-an-iot-device-with-alexa-aws-python-and-raspberry-pi-274d941ef3c3). I hope this is helpful for any level of developer.
 
-The code should be well documented for a more technical look than the blog article touches upon. The three directories correspond to where that code will be used. Likely, the only code that will be run by a developer's device will be on the Raspberry Pi. However, I find it helpful to maintain the environment variables on your development computer for reference. I will **only** be reviewing the set up and deploy for code here. **The commands will be for Linux.** For a full tutorial of setting up the Amazon Services and the lights please visit the [blog](https://www.medium.com).
+The code should be well documented for a more technical look than the blog article touches upon. The three directories correspond to where that code will be used. Likely, the only code that will be run by a developer's device will be on the Raspberry Pi. However, I find it helpful to maintain the environment variables on your development computer for reference. I will **only** be reviewing the set up and deploy for code here. **The commands will be for Linux.** For a full tutorial of setting up the Amazon Services and the lights please visit the [blog](https://medium.com/@arthurltonelli/building-an-iot-device-with-alexa-aws-python-and-raspberry-pi-274d941ef3c3).
 
 ## Requirements
 You will need the following for the running the code of this project.
@@ -42,7 +42,7 @@ export AWS_ALEXA_SKILLS_KIT_ID="amzn1.ask.skill.XXXXX"
 ```
 
 ### AWS Lambda
-There is a bit of set up in AWS. Again look at [this blog](medium.com) for a detailed walk through.
+There is a bit of set up in AWS. Again look at [this blog](https://medium.com/@arthurltonelli/building-an-iot-device-with-alexa-aws-python-and-raspberry-pi-part-ii-8ad84f24a3ee) for a detailed walk through.
 When inside the Lambda function console, zip and upload the code.
 ```
 $ cd ~/<path_to_repo>/lambda_function/
